@@ -1,6 +1,8 @@
 name: Line Counter
 run-name: ${{ github.head_ref }} line count
 on: [pull_request]
+permissions:
+  pull-requests: write
 jobs:
   Explore-GitHub-Actions:
     runs-on: ubuntu-latest

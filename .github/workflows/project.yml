@@ -14,8 +14,8 @@ jobs:
           fetch-depth: 0
       - name: Calculate lines
         run: |
-          git branch -r
-          for branch in $(git branch -r); do
+          echo $(git for-each-ref --format='%(refname:short)' refs/heads/)
+          for branch in $(git for-each-ref --format='%(refname:short)' refs/heads/); do
             git checkout $branch
             echo "Branch $branch:" >> out.txt
             echo "📊 Repo Stats After This PR:" >> out.txt

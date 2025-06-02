@@ -22,13 +22,16 @@ jobs:
             echo "- Total files: $(find . -type f -not -path './.git/*' | wc -l)" >> out.txt
             echo "- Total lines of code: $(find . -type f -not -path './.git/*' | xargs wc -l | sed -nE 's/\s+([0-9]+) total/\1/p')" >> out.txt
           done
-      - name: View lines
-        id: view
+      - name: Output lines
+        id: output
         run: |
-          cat out.txt
           echo 'lines<<EOF' >> $GITHUB_OUTPUT
           echo $(cat out.txt) >> "$GITHUB_OUTPUT"
           echo 'EOF' >> $GITHUB_OUTPUT
+      - name: View lines
+        id: view
+        run: |
+          echo '${{ steps.output.outputs.lines }}'
       - name: Comment on PR
         run: |
           gh pr comment "$PR_URL" -F out.txt
@@ -38,5 +41,5 @@ jobs:
       - name: Post Google Chat message
         uses: julb/action-post-googlechat-message@v1
         with:
-          message: '${{ steps.view.outputs.lines }}'
+          message: '${{ steps.output.outputs.lines }}'
           gchat_webhook_url: '${{ secrets.GOOGLE_CHAT_WEBHOOK_URL }}'

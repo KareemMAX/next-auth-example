@@ -1,0 +1,47 @@
+name: Line Counter
+run-name: ${{ github.head_ref }} line count
+on: [pull_request]
+permissions:
+  pull-requests: write
+  contents: read
+jobs:
+  Explore-GitHub-Actions:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Calculate lines
+        run: |
+          echo "$(git for-each-ref --format='%(refname:short)' refs/remotes/origin)"
+          for branch in $(git for-each-ref --format='%(refname:short)' refs/remotes/origin); do
+            git checkout $branch
+            echo "Branch $branch:" >> out.txt
+            echo "📊 Repo Stats After This PR:" >> out.txt
+            echo "- Total files: $(find . -type f -not -path './.git/*' | wc -l)" >> out.txt
+            echo "- Total lines of code: $(find . -type f -not -path './.git/*' | xargs wc -l | sed -nE 's/\s+([0-9]+) total/\1/p')" >> out.txt
+          done
+      - name: Output lines
+        id: output
+        run: |
+          {  
+            echo 'lines<<EOF'
+            cat out.txt
+            echo 'EOF'
+          } >> $GITHUB_OUTPUT
+      - name: View lines
+        id: view
+        run: |
+          echo '${{ steps.output.outputs.lines }}'
+      - name: Comment on PR
+        run: |
+          gh pr comment "$PR_URL" -F out.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+      - name: Post Google Chat message
+        uses: julb/action-post-googlechat-message@v1
+        with:
+          message: '${{ steps.output.outputs.lines }}'
+          gchat_webhook_url: '${{ secrets.GOOGLE_CHAT_WEBHOOK_URL }}'

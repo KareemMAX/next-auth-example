@@ -26,7 +26,9 @@ jobs:
         id: view
         run: |
           cat out.txt
-          echo "lines=$(cat out.txt)" >> "$GITHUB_OUTPUT"
+          echo 'lines<<EOF' >> $GITHUB_OUTPUT
+          echo $(cat out.txt) >> "$GITHUB_OUTPUT"
+          echo 'EOF' >> $GITHUB_OUTPUT
       - name: Comment on PR
         run: |
           gh pr comment "$PR_URL" -F out.txt

@@ -12,3 +12,9 @@ jobs:
           echo "📊 Repo Stats After This PR:" >> out.txt
           echo "- Total files: $(find . -type f | wc -l)" >> out.txt
           echo "- Total lines of code: $(find . -type f | xargs wc -l)" >> out.txt
+      - name: View lines
+        run: |
+          cat out.txt
+      - name: Comment on PR
+        run: |
+          gh pr comment "$PR_URL" -F out.txt

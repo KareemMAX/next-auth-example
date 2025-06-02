@@ -12,9 +12,13 @@ jobs:
         uses: actions/checkout@v4
       - name: Calculate lines
         run: |
-          echo "📊 Repo Stats After This PR:" >> out.txt
-          echo "- Total files: $(find . -type f -not -path './.git/*' | wc -l)" >> out.txt
-          echo "- Total lines of code: $(find . -type f -not -path './.git/*' | xargs wc -l | sed -nE 's/([0-9]+) total/\1/p')" >> out.txt
+          for branch in $(git branch -r); do
+            git checkout $branch
+            echo "Branch $branch:" >> out.txt
+            echo "📊 Repo Stats After This PR:" >> out.txt
+            echo "- Total files: $(find . -type f -not -path './.git/*' | wc -l)" >> out.txt
+            echo "- Total lines of code: $(find . -type f -not -path './.git/*' | xargs wc -l | sed -nE 's/\s+([0-9]+) total/\1/p')" >> out.txt
+          done
       - name: View lines
         run: |
           cat out.txt

@@ -14,7 +14,7 @@ jobs:
           fetch-depth: 0
       - name: Calculate lines
         run: |
-          echo $(git branch -r)
+          git branch -r
           for branch in $(git branch -r); do
             git checkout $branch
             echo "Branch $branch:" >> out.txt
